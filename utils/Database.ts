@@ -115,7 +115,7 @@ const createTables = async (db: SQLiteDatabase) => {
           CREATE TABLE IF NOT EXISTS daily (
               id INTEGER PRIMARY KEY,
               habits_id INTEGER NOT NULL,
-              date DATE NOT NULL,
+              date TEXT NOT NULL,
               completed BOOLEAN,
               count INTEGER,
               FOREIGN KEY (habits_id) REFERENCES habits(id)
@@ -134,18 +134,18 @@ export const insertSampleData = async (db: SQLiteDatabase) => {
         (6, 'exercise', 'intensity');
 
         INSERT INTO daily (id, habits_id, date, completed, count) VALUES
-        (1, 1, 2024-06-15, TRUE, 4),
-        (2, 1, 2024-06-14, TRUE, 4),
-        (3, 1, 2024-06-13, TRUE, 4),
-        (4, 1, 2024-06-12, TRUE, 4),
-        (5, 6, 2024-06-15, FALSE, 0),
-        (6, 6, 2024-06-14, TRUE, 8),
-        (7, 6, 2024-06-13, TRUE, 7),
-        (8, 6, 2024-06-12, TRUE, 5),
-        (9, 6, 2024-06-11, TRUE, 5),
-        (10, 6, 2024-06-10, FALSE, 0),
-        (11, 6, 2024-06-09, FALSE, 0),
-        (12, 6, 2024-06-08, TRUE, 5);
+        (1, 1, date("2024-06-22"), False, 0),
+        (2, 1, date("2024-06-21"), TRUE, 4),
+        (3, 1, date("2024-06-20"), TRUE, 4),
+        (4, 1, date("2024-06-19"), TRUE, 4),
+        (5, 6, date("2024-06-22"), FALSE, 0),
+        (6, 6, date("2024-06-21"), TRUE, 8),
+        (7, 6, date("2024-06-20"), TRUE, 7),
+        (8, 6, date("2024-06-19"), TRUE, 5),
+        (9, 6, date("2024-06-18"), TRUE, 5),
+        (10, 6,date("2024-06-17"), FALSE, 0),
+        (11, 6,date("2024-06-16"), FALSE, 0),
+        (12, 6,date("2024-06-15"), TRUE, 5);
         `);
 };
 
@@ -158,7 +158,6 @@ export const dropTables = async (db: SQLiteDatabase) => {
         DROP TABLE IF EXISTS weeklycompleted;
         DROP TABLE IF EXISTS todos;
         `);
-  console.log(response);
 };
 
 // const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -194,8 +193,39 @@ export const addHabit = async (db: SQLiteDatabase, name: string) => {
   );
 };
 
+interface HabitObject{
+    completed: number;
+    count: number;
+    date: Date;
+    name: string;
+    units: string;
+};
+
 export const getHabits = async (db: SQLiteDatabase) => {
-  return await db.getAllAsync("SELECT * FROM habits");
+  const allRows:HabitObject[] = await db.getAllAsync(`
+    SELECT
+        name, units, date, completed, count
+    FROM 
+        habits
+    INNER JOIN
+        daily ON habits.id=daily.habits_id
+    ORDER BY
+        daily.date `);
+
+  //console.log(await db.getFirstAsync("SELECT date FROM daily"));
+
+  console.log(typeof(allRows));
+  console.log("----------------------------------------------")
+
+//   const habits:Object = [];
+
+//   let counter = 0;
+//   for (const row of allRows) {
+//     habits[counter] = row;
+//     counter++;
+//   }
+
+  return allRows;
 };
 
 export const tableStructure = async (db: SQLiteDatabase) => {
