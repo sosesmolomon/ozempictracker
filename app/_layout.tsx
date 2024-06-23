@@ -44,7 +44,6 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  console.log("rootlayout");
   return (
     <SQLiteProvider databaseName="tracker.db" onInit={migrateDbIfNeeded}>
       <Stack>
